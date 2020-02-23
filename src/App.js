@@ -1,24 +1,69 @@
-import React from 'react';
-import logo from './logo.svg';
+import React, { useState } from 'react';
+import Draggable from 'react-draggable';
 import './App.css';
 
 function App() {
+  const [devices, setDevices] = useState([]);
+
+  function handleSetDevices(device) {
+    setDevices([...devices, device]);
+  }
+
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+    <div>
+      {/* Kokeilu */}
+      <Blueprint>
+        <Draggable bounds="parent">
+          <div className="box">
+            {devices[0]}
+          </div>
+        </Draggable>
+      </Blueprint>
+      <AddDevice onAddDevice={handleSetDevices} />
+    </div>
+  );
+}
+
+function Blueprint(props) {
+
+  return (
+    <div className="blueprintImg">
+      {props.children}
+    </div>
+  );
+}
+
+function AddDevice(props) {
+  const [devName, setDevName] = useState('');
+
+  function handleNameChange(e) {
+    setDevName(e.target.value);
+  }
+
+  function handleSetDevices(e) {
+    const newDevice = <Device devName={devName} />
+    props.onAddDevice(newDevice);
+    e.preventDefault();
+  }
+
+  return (
+      <form onSubmit={handleSetDevices}>
+        <label>
+          Name:
+          <input type="text" value={devName} onChange={handleNameChange} />
+        </label>
+        <input type="submit" value="Add" />
+      </form>
+  );
+}
+
+function Device(props) {
+
+  return (
+    <div>
+      <p>Name: {props.devName}</p>
+      <p>Temp</p>
+      <p>Hum</p>
     </div>
   );
 }

@@ -1,3 +1,21 @@
+.blueprintImg {
+  width: 1280px;
+  height: 720px;
+  position: relative;
+  background-image: url(https://via.placeholder.com/1280x720/);
+}
+
+.box {
+  background-color: #999;
+  border: 1px solid #999;
+  border-radius: 3px;
+  width: 180px;
+  height: 180px;
+  margin: 10px;
+  padding: 10px;
+  float: left;
+}
+
 .App {
   text-align: center;
 }
