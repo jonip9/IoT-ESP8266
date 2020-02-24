@@ -13,11 +13,7 @@ function App() {
     <div>
       {/* Kokeilu */}
       <Blueprint>
-        <Draggable bounds="parent">
-          <div className="box">
-            {devices[0]}
-          </div>
-        </Draggable>
+        {devices}
       </Blueprint>
       <AddDevice onAddDevice={handleSetDevices} />
     </div>
@@ -47,13 +43,13 @@ function AddDevice(props) {
   }
 
   return (
-      <form onSubmit={handleSetDevices}>
-        <label>
-          Name:
+    <form onSubmit={handleSetDevices}>
+      <label>
+        Name:
           <input type="text" value={devName} onChange={handleNameChange} />
-        </label>
-        <input type="submit" value="Add" />
-      </form>
+      </label>
+      <input type="submit" value="Add" />
+    </form>
   );
 }
 
@@ -61,9 +57,13 @@ function Device(props) {
 
   return (
     <div>
-      <p>Name: {props.devName}</p>
-      <p>Temp</p>
-      <p>Hum</p>
+      <Draggable bounds="parent">
+        <div className="box">
+          <p>Name: {props.devName}</p>
+          <p>Temp</p>
+          <p>Hum</p>
+        </div>
+      </Draggable>
     </div>
   );
 }
