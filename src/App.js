@@ -11,7 +11,6 @@ function App() {
 
   return (
     <div>
-      {/* Kokeilu */}
       <Blueprint>
         {devices}
       </Blueprint>
@@ -56,15 +55,15 @@ function AddDevice(props) {
 function Device(props) {
 
   return (
-    <div>
+    <>
       <Draggable bounds="parent">
-        <div className="box">
+        <div className="box" style={{ position: 'absolute' }}>
           <p>Name: {props.devName}</p>
           <p>Temp</p>
           <p>Hum</p>
         </div>
       </Draggable>
-    </div>
+    </>
   );
 }
 
