@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Draggable from 'react-draggable';
 import './App.css';
 
@@ -53,18 +53,51 @@ function AddDevice(props) {
 }
 
 function Device(props) {
+  const { data, error } = useFetchDeviceData(props.devName);
 
   return (
     <>
       <Draggable bounds="parent">
         <div className="box" style={{ position: 'absolute' }}>
           <p>Name: {props.devName}</p>
-          <p>Temp</p>
-          <p>Hum</p>
+          <p>Temp: {data.url}</p>
+          <p>Hum: {data.hum}</p>
         </div>
       </Draggable>
     </>
   );
+}
+
+function useFetchDeviceData(deviceName) {
+  const [data, setData] = useState({});
+  const [error, setError] = useState(null);
+  const url = 'x' + deviceName + 'y';
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      const fetchData = async () => {
+        fetch(url)
+          .then((res) => {
+            if (!res.ok) {
+              throw new Error('Error');
+            }
+            return res.json();
+          })
+          .then((json) => {
+            setData(json);
+          })
+          .then((error) => {
+            setError(error);
+          });
+        //setLoading tähän?
+      }
+
+      fetchData();
+    }, 5000);
+    return () => clearInterval(interval);
+  }, [url]);
+
+  return { data, error };
 }
 
 export default App;
