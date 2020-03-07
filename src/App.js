@@ -4,14 +4,16 @@ import './App.css';
 
 function App() {
   const [devices, setDevices] = useState([]);
-  //const { data, error } = useFetchAllDevices();
+  const { data, error } = useFetchAllDevices();
 
-  /* useEffect(() => {
-    data.forEach(element => {
-      let singleDevice = <Device devName={element.deviceName} position={{ x: element.posX, y: element.posY }} />
-      setDevices([...devices, singleDevice]);
-    });
-  }); */
+  useEffect(() => {
+    if (data.length > 0) {
+      data.forEach(element => {
+        let singleDevice = <Device devName={element.deviceName} position={{ x: element.posX, y: element.posY }} />
+        setDevices([...devices, singleDevice]);
+      });
+    }
+  }, [data, devices]);
 
   function handleSetDevices(device) {
     setDevices([...devices, device]);
@@ -64,8 +66,11 @@ function Device(props) {
   const [controlledPosition, setControlledPosition] = useState({ x: 0, y: 0 });
   const { data, error } = useFetchDeviceData(props.devName);
 
+  // Kommentti pois kun servu toimii
   /* useEffect(() => {
-    setControlledPosition(props.position);
+    if (props.position.x >= 0 && props.position.y >= 0) {
+      setControlledPosition(props.position);
+    }
   }, [props.position]); */
 
   function onControlledDrag(e, position) {
@@ -144,7 +149,7 @@ function useFetchDeviceData(deviceName) {
 }
 
 function useFetchAllDevices() {
-  const [data, setData] = useState([{}]);
+  const [data, setData] = useState([]);
   const [error, setError] = useState(null);
   const url = '';
 
@@ -153,19 +158,19 @@ function useFetchAllDevices() {
       fetch(url, {
         method: 'GET',
       })
-      .then((res) => {
-        if (!res.ok) {
-          throw new Error('Error');
-        }
-        return res.json();
-      })
-      .then((json) => {
-        setData(json);
-      })
-      .catch((error) => {
-        setError(error);
-        console.error(error);
-      });
+        .then((res) => {
+          if (!res.ok) {
+            throw new Error('Error');
+          }
+          return res.json();
+        })
+        .then((json) => {
+          setData(json);
+        })
+        .catch((error) => {
+          setError(error);
+          console.error(error);
+        });
     }
 
     fetchAllDevices();
