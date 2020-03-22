@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import Draggable from 'react-draggable';
+import 'bootstrap/dist/css/bootstrap.min.css';
+import { Button, Form, Input, Label, FormGroup } from 'reactstrap';
 import './App.css';
 
 function App() {
@@ -52,13 +54,13 @@ function AddDevice(props) {
   }
 
   return (
-    <form onSubmit={handleSetDevices}>
-      <label>
-        Name:
-          <input type="text" value={devName} onChange={handleNameChange} />
-      </label>
-      <input type="submit" value="Add" />
-    </form>
+    <Form onSubmit={handleSetDevices} inline>
+      <FormGroup className="mb-2 mr-sm-2 mb-sm-0">
+        <Label for="inputDeviceName" className="mr-sm-2">Name</Label>
+        <Input id="inputDeviceName" type="text" value={devName} onChange={handleNameChange} />
+      </FormGroup>
+      <Button type="submit">Add</Button>
+    </Form>
   );
 }
 
