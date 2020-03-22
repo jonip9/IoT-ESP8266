@@ -14,17 +14,9 @@
 }
 
 .box2 {
-  width: 180px;
-  float: left;
+  width: 150px;
 }
 
-.App-header {
-  background-color: #282c34;
-  min-height: 100vh;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  font-size: calc(10px + 2vmin);
-  color: white;
+.formGroup {
+  max-width: 20em;
 }
