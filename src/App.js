@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import Draggable from 'react-draggable';
 import 'bootstrap/dist/css/bootstrap.min.css';
-import { Button, Form, Input, Label, FormGroup } from 'reactstrap';
+import { Button, Form, Input, Label, FormGroup, Card, CardBody, CardHeader, CardText } from 'reactstrap';
 import './App.css';
 
 function App() {
@@ -104,12 +104,20 @@ function Device(props) {
   return (
     <>
       <Draggable bounds="parent" position={controlledPosition} onDrag={onControlledDrag}>
-        <div className="box" style={{ position: 'absolute' }}>
-          <p>Name: {props.devName} {controlledPosition.x + ' ' + controlledPosition.y}</p>
-          <p>Temp: {data.temp}</p>
-          <p>Hum: {data.hum}</p>
-          <button type="button" onClick={onSaveClick}>Save</button>
-        </div>
+          <Card className="box2">
+            <CardHeader>
+              Name: {props.devName}
+            </CardHeader>
+            <CardBody>
+              <CardText>
+                Temp: {controlledPosition.x}
+              </CardText>
+              <CardText>
+                Hum: {controlledPosition.y}
+              </CardText>
+              <Button type="button" onClick={onSaveClick}>Save</Button>
+            </CardBody>
+          </Card>
       </Draggable>
     </>
   );
