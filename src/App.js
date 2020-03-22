@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import Draggable from 'react-draggable';
+import 'bootstrap/dist/css/bootstrap.min.css';
+import { Button, Form, Input, Label, FormGroup, Card, CardBody, CardHeader, CardText, Container, Row, Col } from 'reactstrap';
 import './App.css';
 
 function App() {
@@ -20,12 +22,20 @@ function App() {
   }
 
   return (
-    <div>
-      <Blueprint>
-        {devices}
-      </Blueprint>
-      <AddDevice onAddDevice={handleSetDevices} />
-    </div>
+    <>
+      <Container className="mt-2" fluid={true}>
+        <Row>
+          <Col>
+            <Blueprint>
+              {devices}
+            </Blueprint>
+          </Col>
+          <Col>
+            <AddDevice onAddDevice={handleSetDevices} />
+          </Col>
+        </Row>
+      </Container>
+    </>
   );
 }
 
@@ -52,13 +62,13 @@ function AddDevice(props) {
   }
 
   return (
-    <form onSubmit={handleSetDevices}>
-      <label>
-        Name:
-          <input type="text" value={devName} onChange={handleNameChange} />
-      </label>
-      <input type="submit" value="Add" />
-    </form>
+    <Form onSubmit={handleSetDevices}>
+      <FormGroup className="formGroup">
+        <Label for="inputDeviceName">Name</Label>
+          <Input id="inputDeviceName"type="text" value={devName} onChange={handleNameChange} />
+      </FormGroup>
+      <Button type="submit">Add</Button>
+    </Form>
   );
 }
 
@@ -102,12 +112,20 @@ function Device(props) {
   return (
     <>
       <Draggable bounds="parent" position={controlledPosition} onDrag={onControlledDrag}>
-        <div className="box" style={{ position: 'absolute' }}>
-          <p>Name: {props.devName} {controlledPosition.x + ' ' + controlledPosition.y}</p>
-          <p>Temp: {data.temp}</p>
-          <p>Hum: {data.hum}</p>
-          <button type="button" onClick={onSaveClick}>Save</button>
-        </div>
+        <Card className="box2">
+          <CardHeader>
+            Name: {props.devName}
+          </CardHeader>
+          <CardBody>
+            <CardText>
+              Temp: {controlledPosition.x}
+            </CardText>
+            <CardText>
+              Hum: {controlledPosition.y}
+            </CardText>
+            <Button type="button" onClick={onSaveClick}>Save</Button>
+          </CardBody>
+        </Card>
       </Draggable>
     </>
   );
