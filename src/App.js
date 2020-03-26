@@ -118,10 +118,10 @@ function Device(props) {
           </CardHeader>
           <CardBody>
             <CardText>
-              Temp: {controlledPosition.x}
+              Temp: {data.out.celsius} X: {controlledPosition.x}
             </CardText>
             <CardText>
-              Hum: {controlledPosition.y}
+              Hum: {data.out.humidity} Y: {controlledPosition.y}
             </CardText>
             <Button type="button" onClick={onSaveClick}>Save</Button>
           </CardBody>
@@ -132,15 +132,21 @@ function Device(props) {
 }
 
 function useFetchDeviceData(deviceName) {
-  const [data, setData] = useState({});
+  const [data, setData] = useState({ 'out': { 'humidity': 0.0, 'celsius': 0.0 }});
   const [error, setError] = useState(null);
-  const url = 'x' + deviceName + 'y';
+  const url = 'https://api.thinger.io/v2/users/AlbertoTomba/devices/' + deviceName + '/dht11';
 
   useEffect(() => {
     const interval = setInterval(() => {
+      const myHeaders = new Headers({
+        'Authorization': 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJkZXYiOiJlc3A4MjY2IiwiaWF0IjoxNTg1MjQwMjk4LCJqdGkiOiI1ZTdjZDhlYTJlYTg2YmFiN2I5Yzg1M2YiLCJ1c3IiOiJBbGJlcnRvVG9tYmEifQ.q5MEflhSN0w5mqu4C-56bg3Yb1Sb5Idrvw0MToesWWM'
+      });
+
       const fetchData = async () => {
         fetch(url, {
           method: 'GET',
+          credentials: 'same-origin',
+          headers: myHeaders
         })
           .then((res) => {
             if (!res.ok) {
