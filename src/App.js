@@ -114,14 +114,14 @@ function Device(props) {
       <Draggable bounds="parent" position={controlledPosition} onDrag={onControlledDrag}>
         <Card className="box2">
           <CardHeader>
-            Name: {props.devName}
+            {props.devName}
           </CardHeader>
           <CardBody>
             <CardText>
-              Temp: {data.out.celsius} X: {controlledPosition.x}
+              Temp: {data.out.celsius} &#8451;
             </CardText>
             <CardText>
-              Hum: {data.out.humidity} Y: {controlledPosition.y}
+              Hum: {data.out.humidity} %
             </CardText>
             <Button type="button" onClick={onSaveClick}>Save</Button>
           </CardBody>
