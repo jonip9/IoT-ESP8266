@@ -16,7 +16,8 @@
 }
 
 .box2 {
-  width: 150px;
+  width: fit-content;
+  position: fixed;
 }
 
 .formGroup {

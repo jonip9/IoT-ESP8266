@@ -1,11 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import Draggable from 'react-draggable';
 import 'bootstrap/dist/css/bootstrap.min.css';
-import { Button, Form, Input, Label, FormGroup, Card, CardBody, CardHeader, CardText, Container, Row, Col } from 'reactstrap';
+import { Button, Form, Input, Label, FormGroup, Card, CardBody, CardHeader, CardText, Container, Row, Col, Table, UncontrolledCollapse, Collapse } from 'reactstrap';
 import './App.css';
 
 function App() {
   const [devices, setDevices] = useState([]);
+  const [devicesTableRows, setDevicesTableRows] = useState([]);
   const { data, error } = useFetchAllDevices();
 
   useEffect(() => {
@@ -17,8 +18,9 @@ function App() {
     }
   }, [data, devices]);
 
-  function handleSetDevices(device) {
+  function handleSetDevices(device, deviceRow) {
     setDevices([...devices, device]);
+    setDevicesTableRows([...devicesTableRows, deviceRow])
   }
 
   return (
@@ -32,6 +34,10 @@ function App() {
           </Col>
           <Col>
             <AddDevice onAddDevice={handleSetDevices} />
+            <p />
+            <DevicesTable>
+              {devicesTableRows}
+            </DevicesTable>
           </Col>
         </Row>
       </Container>
@@ -48,6 +54,40 @@ function Blueprint(props) {
   );
 }
 
+function DevicesTable(props) {
+
+  return (
+    <>
+      <Table hover>
+        <thead>
+          <tr>
+            <th>Name</th>
+            <th>Temp &#8451;</th>
+            <th>Hum %</th>
+          </tr>
+        </thead>
+        <tbody>
+          {props.children}
+        </tbody>
+      </Table>
+    </>
+  );
+}
+
+function DeviceRow(props) {
+  const { data, error } = useFetchDeviceData(props.devName);
+
+  return (
+    <>
+      <tr>
+        <td>{props.devName}</td>
+        <td>{data.out.celsius}</td>
+        <td>{data.out.humidity}</td>
+      </tr>
+    </>
+  );
+}
+
 function AddDevice(props) {
   const [devName, setDevName] = useState('');
 
@@ -57,7 +97,8 @@ function AddDevice(props) {
 
   function handleSetDevices(e) {
     const newDevice = <Device devName={devName} />
-    props.onAddDevice(newDevice);
+    const newDeviceRow = <DeviceRow devName={devName} />
+    props.onAddDevice(newDevice, newDeviceRow);
     e.preventDefault();
   }
 
@@ -65,7 +106,7 @@ function AddDevice(props) {
     <Form onSubmit={handleSetDevices}>
       <FormGroup className="formGroup">
         <Label for="inputDeviceName">Name</Label>
-          <Input id="inputDeviceName"type="text" value={devName} onChange={handleNameChange} />
+        <Input id="inputDeviceName" type="text" value={devName} onChange={handleNameChange} />
       </FormGroup>
       <Button type="submit">Add</Button>
     </Form>
@@ -74,7 +115,14 @@ function AddDevice(props) {
 
 function Device(props) {
   const [controlledPosition, setControlledPosition] = useState({ x: 0, y: 0 });
+  const [isOpen, setIsOpen] = useState(false);
   const { data, error } = useFetchDeviceData(props.devName);
+
+  const toggle = () => setIsOpen(!isOpen);
+
+  const shortenName = () => {
+    return String(props.devName).substr(0,3);
+  }
 
   // Kommentti pois kun servu toimii
   /* useEffect(() => {
@@ -114,18 +162,20 @@ function Device(props) {
     <>
       <Draggable bounds="parent" position={controlledPosition} onDrag={onControlledDrag}>
         <Card className="box2">
-          <CardHeader>
-            {props.devName}
+          <CardHeader onDoubleClick={toggle}>
+            {(isOpen) ? props.devName : shortenName()}
           </CardHeader>
-          <CardBody>
-            <CardText>
-              Temp: {data.out.celsius} &#8451;
+          <Collapse isOpen={isOpen}>
+            <CardBody>
+              <CardText>
+                Temp: {data.out.celsius} &#8451;
             </CardText>
-            <CardText>
-              Hum: {data.out.humidity} %
+              <CardText>
+                Hum: {data.out.humidity} %
             </CardText>
-            <Button type="button" onClick={onSaveClick}>Save</Button>
-          </CardBody>
+              <Button type="button" onClick={onSaveClick}>Save</Button>
+            </CardBody>
+          </Collapse>
         </Card>
       </Draggable>
     </>
@@ -133,7 +183,7 @@ function Device(props) {
 }
 
 function useFetchDeviceData(deviceName) {
-  const [data, setData] = useState({ 'out': { 'humidity': 0.0, 'celsius': 0.0 }});
+  const [data, setData] = useState({ 'out': { 'humidity': 0.0, 'celsius': 0.0 } });
   const [error, setError] = useState(null);
   const url = 'https://api.thinger.io/v2/users/AlbertoTomba/devices/' + deviceName + '/dht11';
 
