@@ -91,8 +91,9 @@ function Device(props) {
   function onSaveClick() {
     const data = { deviceName: props.devName, posX: controlledPosition.x, posY: controlledPosition.y };
 
-    fetch('', {
+    fetch('http://localhost:3001/add', {
       method: 'POST',
+      mode: 'no-cors',
       headers: {
         'Content-Type': 'application/json',
       },
@@ -175,7 +176,7 @@ function useFetchDeviceData(deviceName) {
 function useFetchAllDevices() {
   const [data, setData] = useState([]);
   const [error, setError] = useState(null);
-  const url = '';
+  const url = 'http://localhost:3001/';
 
   useEffect(() => {
     const fetchAllDevices = async () => {
