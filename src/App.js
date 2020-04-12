@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import Draggable from 'react-draggable';
 import 'bootstrap/dist/css/bootstrap.min.css';
-import { Button, Form, Input, Label, FormGroup, Card, CardBody, CardHeader, CardText, Container, Row, Col, Table, UncontrolledCollapse, Collapse } from 'reactstrap';
+import { Button, Form, Input, Label, FormGroup, Card, CardBody, CardHeader, CardText, Container, Row, Col, Table, Collapse } from 'reactstrap';
 import './App.css';
 
 function App() {
@@ -12,11 +12,14 @@ function App() {
   useEffect(() => {
     if (data.length > 0) {
       data.forEach(element => {
-        let singleDevice = <Device devName={element.deviceName} position={{ x: element.posX, y: element.posY }} />
-        setDevices([...devices, singleDevice]);
+        let singleDevice = <Device devName={element.deviceName} position={{ x: element.x, y: element.y }} />
+        let singleDeviceRow = <DeviceRow devName={element.deviceName} />
+
+        setDevices((devices) => [...devices, singleDevice]);
+        setDevicesTableRows((devicesTableRows) => [...devicesTableRows, singleDeviceRow]);
       });
     }
-  }, [data, devices]);
+  }, [data]);
 
   function handleSetDevices(device, deviceRow) {
     setDevices([...devices, device]);
@@ -121,40 +124,40 @@ function Device(props) {
   const toggle = () => setIsOpen(!isOpen);
 
   const shortenName = () => {
-    return String(props.devName).substr(0,3);
+    return String(props.devName).substr(0, 3);
   }
 
   // Kommentti pois kun servu toimii
-  /* useEffect(() => {
-    if (props.position.x >= 0 && props.position.y >= 0) {
+  useEffect(() => {
+    if (props.position !== undefined) {
       setControlledPosition(props.position);
     }
-  }, [props.position]); */
+  }, [props.position]);
 
   function onControlledDrag(e, position) {
     const { x, y } = position;
     setControlledPosition({ x, y });
   }
 
-  function onSaveClick() {
-    const data = { deviceName: props.devName, posX: controlledPosition.x, posY: controlledPosition.y };
+  function onSaveClick(devname, posx, posy) {
+    const data = { devName: devname, posX: posx, posY: posy };
+    console.log(data);
 
     fetch('http://localhost:3001/add', {
       method: 'POST',
-      mode: 'no-cors',
       headers: {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify(data),
     })
-      .then((res) => {
-        if (!res.ok) {
-          throw new Error('Error');
-        }
-        res.json();
+      .then((response) => {
+        response.json();
+      })
+      .then((data) => {
+        console.log('Success', data);
       })
       .catch((error) => {
-        console.error(error);
+        console.error('Error', error);
       })
   }
 
@@ -173,7 +176,7 @@ function Device(props) {
               <CardText>
                 Hum: {data.out.humidity} %
             </CardText>
-              <Button type="button" onClick={onSaveClick}>Save</Button>
+              <Button type="button" onClick={() => onSaveClick(props.devName, controlledPosition.x, controlledPosition.y)}>Save</Button>
             </CardBody>
           </Collapse>
         </Card>
@@ -226,18 +229,19 @@ function useFetchDeviceData(deviceName) {
 function useFetchAllDevices() {
   const [data, setData] = useState([]);
   const [error, setError] = useState(null);
-  const url = 'http://localhost:3001/';
+  const url = 'http://localhost:3001/fetch';
 
   useEffect(() => {
     const fetchAllDevices = async () => {
       fetch(url, {
         method: 'GET',
       })
-        .then((res) => {
-          if (!res.ok) {
+        .then((response) => {
+          if (!response.ok) {
             throw new Error('Error');
           }
-          return res.json();
+          console.log(response);
+          return response.json();
         })
         .then((json) => {
           setData(json);
