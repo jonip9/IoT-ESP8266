@@ -16,7 +16,7 @@
 }
 
 .box2 {
-  width: fit-content;
+  width: -moz-fit-content;
   position: fixed;
 }
 

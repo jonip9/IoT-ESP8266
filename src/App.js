@@ -6,24 +6,27 @@ import './App.css';
 
 function App() {
   const [devices, setDevices] = useState([]);
-  const [devicesTableRows, setDevicesTableRows] = useState([]);
   const { data, error } = useFetchAllDevices();
 
   useEffect(() => {
     if (data.length > 0) {
       data.forEach(element => {
-        let singleDevice = <Device devName={element.deviceName} position={{ x: element.x, y: element.y }} />
-        let singleDeviceRow = <DeviceRow devName={element.deviceName} />
+        let singleDevice = { id: element._id, devName: element.deviceName, position: { x: element.x, y: element.y } }
 
         setDevices((devices) => [...devices, singleDevice]);
-        setDevicesTableRows((devicesTableRows) => [...devicesTableRows, singleDeviceRow]);
       });
     }
   }, [data]);
 
   function handleSetDevices(device, deviceRow) {
     setDevices([...devices, device]);
-    setDevicesTableRows([...devicesTableRows, deviceRow])
+  }
+
+  function handleDeleteDevice(i, e) {
+    const newDeviceList = devices.filter((item, index) => {
+      return i !== index;
+    });
+    setDevices([...newDeviceList]);
   }
 
   return (
@@ -32,14 +35,22 @@ function App() {
         <Row>
           <Col>
             <Blueprint>
-              {devices}
+              {devices.map((item, i) => {
+                return (
+                  <Device deviceData={item} key={item.id} onDelete={() => handleDeleteDevice(i)} />
+                );
+              })}
             </Blueprint>
           </Col>
           <Col>
             <AddDevice onAddDevice={handleSetDevices} />
             <p />
             <DevicesTable>
-              {devicesTableRows}
+              {devices.map((item, i) => {
+                return (
+                  <DeviceRow deviceData={item} key={item.id} onDelete={() => handleDeleteDevice(i)} />
+                );
+              })}
             </DevicesTable>
           </Col>
         </Row>
@@ -67,6 +78,7 @@ function DevicesTable(props) {
             <th>Name</th>
             <th>Temp &#8451;</th>
             <th>Hum %</th>
+            <th></th>
           </tr>
         </thead>
         <tbody>
@@ -78,14 +90,15 @@ function DevicesTable(props) {
 }
 
 function DeviceRow(props) {
-  const { data, error } = useFetchDeviceData(props.devName);
+  const { data, error } = useFetchDeviceData(props.deviceData.devName);
 
   return (
     <>
-      <tr>
-        <td>{props.devName}</td>
+      <tr key={props.deviceData.id}>
+        <td>{props.deviceData.devName}</td>
         <td>{data.out.celsius}</td>
         <td>{data.out.humidity}</td>
+        <td><Button type="button" onClick={props.onDelete}>Delete</Button></td>
       </tr>
     </>
   );
@@ -99,9 +112,8 @@ function AddDevice(props) {
   }
 
   function handleSetDevices(e) {
-    const newDevice = <Device devName={devName} />
-    const newDeviceRow = <DeviceRow devName={devName} />
-    props.onAddDevice(newDevice, newDeviceRow);
+    const newDevice = { id: devName, devName: devName }
+    props.onAddDevice(newDevice);
     e.preventDefault();
   }
 
@@ -119,20 +131,19 @@ function AddDevice(props) {
 function Device(props) {
   const [controlledPosition, setControlledPosition] = useState({ x: 0, y: 0 });
   const [isOpen, setIsOpen] = useState(false);
-  const { data, error } = useFetchDeviceData(props.devName);
+  const { data, error } = useFetchDeviceData(props.deviceData.devName);
 
   const toggle = () => setIsOpen(!isOpen);
 
   const shortenName = () => {
-    return String(props.devName).substr(0, 3);
+    return String(props.deviceData.devName).substr(0, 3);
   }
 
-  // Kommentti pois kun servu toimii
   useEffect(() => {
-    if (props.position !== undefined) {
-      setControlledPosition(props.position);
+    if (props.deviceData.position !== undefined) {
+      setControlledPosition(props.deviceData.position);
     }
-  }, [props.position]);
+  }, [props.deviceData.position]);
 
   function onControlledDrag(e, position) {
     const { x, y } = position;
@@ -166,7 +177,7 @@ function Device(props) {
       <Draggable bounds="parent" position={controlledPosition} onDrag={onControlledDrag}>
         <Card className="box2">
           <CardHeader onDoubleClick={toggle}>
-            {(isOpen) ? props.devName : shortenName()}
+            {(isOpen) ? props.deviceData.devName : shortenName()}
           </CardHeader>
           <Collapse isOpen={isOpen}>
             <CardBody>
@@ -176,7 +187,8 @@ function Device(props) {
               <CardText>
                 Hum: {data.out.humidity} %
             </CardText>
-              <Button type="button" onClick={() => onSaveClick(props.devName, controlledPosition.x, controlledPosition.y)}>Save</Button>
+              <Button type="button" onClick={() => onSaveClick(props.deviceData.devName, controlledPosition.x, controlledPosition.y)}>Save</Button>
+              <Button type="button" onClick={props.onDelete}>Delete</Button>
             </CardBody>
           </Collapse>
         </Card>
@@ -215,7 +227,6 @@ function useFetchDeviceData(deviceName) {
             setError(error);
             console.error(error);
           });
-        //setLoading tähän?
       }
 
       fetchData();
