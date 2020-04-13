@@ -18,15 +18,34 @@ function App() {
     }
   }, [data]);
 
-  function handleSetDevices(device, deviceRow) {
+  function handleSetDevices(device) {
     setDevices([...devices, device]);
   }
 
-  function handleDeleteDevice(i, e) {
-    const newDeviceList = devices.filter((item, index) => {
-      return i !== index;
-    });
-    setDevices([...newDeviceList]);
+  function handleDeleteDevice(i, devname, e) {
+    const data = { devName: devname }
+
+    fetch('http://localhost:3001/delete', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(data),
+    })
+      .then((response) => {
+        response.json();
+
+        const newDeviceList = devices.filter((item, index) => {
+          return i !== index;
+        });
+        setDevices([...newDeviceList]);
+      })
+      .then((data) => {
+        console.log('Success', data);
+      })
+      .catch((error) => {
+        console.error('Error', error);
+      })
   }
 
   return (
@@ -37,7 +56,7 @@ function App() {
             <Blueprint>
               {devices.map((item, i) => {
                 return (
-                  <Device deviceData={item} key={item.id} onDelete={() => handleDeleteDevice(i)} />
+                  <Device deviceData={item} key={item.id} onDelete={() => handleDeleteDevice(i, item.devName)} />
                 );
               })}
             </Blueprint>
@@ -48,7 +67,7 @@ function App() {
             <DevicesTable>
               {devices.map((item, i) => {
                 return (
-                  <DeviceRow deviceData={item} key={item.id} onDelete={() => handleDeleteDevice(i)} />
+                  <DeviceRow deviceData={item} key={item.id} onDelete={() => handleDeleteDevice(i, item.devName)} />
                 );
               })}
             </DevicesTable>
