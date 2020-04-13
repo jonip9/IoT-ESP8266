@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import Draggable from 'react-draggable';
 import 'bootstrap/dist/css/bootstrap.min.css';
-import { Button, Form, Input, Label, FormGroup, Card, CardBody, CardHeader, CardText, Container, Row, Col, Table, Collapse } from 'reactstrap';
+import { Button, Form, Input, Label, FormGroup, Card, CardBody, CardHeader, CardText, Container, Row, Col, Table, Collapse, Popover, PopoverHeader, PopoverBody } from 'reactstrap';
 import './App.css';
 
 function App() {
@@ -125,14 +125,25 @@ function DeviceRow(props) {
 
 function AddDevice(props) {
   const [devName, setDevName] = useState('');
+  const [popoverOpen, setPopoverOpen] = useState(false);
+
+  function toggle() {
+    if (devName.length === 0) {
+      setPopoverOpen(true);
+    } else {
+      setPopoverOpen(false);
+    }
+  }
 
   function handleNameChange(e) {
     setDevName(e.target.value);
   }
 
   function handleSetDevices(e) {
-    const newDevice = { id: devName, devName: devName }
-    props.onAddDevice(newDevice);
+    if (devName.length > 0) {
+      const newDevice = { id: devName, devName: devName }
+      props.onAddDevice(newDevice);
+    }
     e.preventDefault();
   }
 
@@ -142,7 +153,11 @@ function AddDevice(props) {
         <Label for="inputDeviceName">Name</Label>
         <Input id="inputDeviceName" type="text" value={devName} onChange={handleNameChange} />
       </FormGroup>
-      <Button type="submit">Add</Button>
+      <Button id="AddButton" type="submit">Add</Button>
+      <Popover placement="bottom" isOpen={popoverOpen} target="AddButton" toggle={toggle}>
+        <PopoverHeader>Error</PopoverHeader>
+        <PopoverBody>Please enter name.</PopoverBody>
+      </Popover>
     </Form>
   );
 }
