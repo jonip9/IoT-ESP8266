@@ -25,7 +25,7 @@ function App() {
   function handleDeleteDevice(i, devname, e) {
     const data = { devName: devname }
 
-    fetch('http://localhost:3001/delete', {
+    fetch('https://mongobackend.azurewebsites.net/delete', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -34,11 +34,6 @@ function App() {
     })
       .then((response) => {
         response.json();
-
-        const newDeviceList = devices.filter((item, index) => {
-          return i !== index;
-        });
-        setDevices([...newDeviceList]);
       })
       .then((data) => {
         console.log('Success', data);
@@ -46,6 +41,11 @@ function App() {
       .catch((error) => {
         console.error('Error', error);
       })
+
+      const newDeviceList = devices.filter((item, index) => {
+        return i !== index;
+      });
+      setDevices([...newDeviceList]);
   }
 
   return (
@@ -97,7 +97,6 @@ function DevicesTable(props) {
             <th>Name</th>
             <th>Temp &#8451;</th>
             <th>Hum %</th>
-            <th></th>
           </tr>
         </thead>
         <tbody>
@@ -117,7 +116,6 @@ function DeviceRow(props) {
         <td>{props.deviceData.devName}</td>
         <td>{data.out.celsius}</td>
         <td>{data.out.humidity}</td>
-        <td><Button type="button" onClick={props.onDelete}>Delete</Button></td>
       </tr>
     </>
   );
@@ -188,7 +186,7 @@ function Device(props) {
     const data = { devName: devname, posX: posx, posY: posy };
     console.log(data);
 
-    fetch('http://localhost:3001/add', {
+    fetch('https://mongobackend.azurewebsites.net/add', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -222,6 +220,7 @@ function Device(props) {
                 Hum: {data.out.humidity} %
             </CardText>
               <Button type="button" onClick={() => onSaveClick(props.deviceData.devName, controlledPosition.x, controlledPosition.y)}>Save</Button>
+              &nbsp;
               <Button type="button" onClick={props.onDelete}>Delete</Button>
             </CardBody>
           </Collapse>
@@ -274,7 +273,7 @@ function useFetchDeviceData(deviceName) {
 function useFetchAllDevices() {
   const [data, setData] = useState([]);
   const [error, setError] = useState(null);
-  const url = 'http://localhost:3001/fetch';
+  const url = 'https://mongobackend.azurewebsites.net/fetch';
 
   useEffect(() => {
     const fetchAllDevices = async () => {
