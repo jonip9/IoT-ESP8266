@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import Draggable from 'react-draggable';
 import 'bootstrap/dist/css/bootstrap.min.css';
-import { Button, Form, Input, Label, FormGroup, Card, CardBody, CardHeader, CardText, Container, Row, Col, Table, Collapse } from 'reactstrap';
+import { Button, Form, Input, Label, FormGroup, Card, CardBody, CardHeader, CardText, Container, Row, Col, Table, Collapse, Popover, PopoverHeader, PopoverBody } from 'reactstrap';
 import './App.css';
 
 function App() {
@@ -18,15 +18,34 @@ function App() {
     }
   }, [data]);
 
-  function handleSetDevices(device, deviceRow) {
+  function handleSetDevices(device) {
     setDevices([...devices, device]);
   }
 
-  function handleDeleteDevice(i, e) {
-    const newDeviceList = devices.filter((item, index) => {
-      return i !== index;
-    });
-    setDevices([...newDeviceList]);
+  function handleDeleteDevice(i, devname, e) {
+    const data = { devName: devname }
+
+    fetch('https://mongobackend.azurewebsites.net/delete', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(data),
+    })
+      .then((response) => {
+        response.json();
+      })
+      .then((data) => {
+        console.log('Success', data);
+      })
+      .catch((error) => {
+        console.error('Error', error);
+      })
+
+      const newDeviceList = devices.filter((item, index) => {
+        return i !== index;
+      });
+      setDevices([...newDeviceList]);
   }
 
   return (
@@ -37,7 +56,7 @@ function App() {
             <Blueprint>
               {devices.map((item, i) => {
                 return (
-                  <Device deviceData={item} key={item.id} onDelete={() => handleDeleteDevice(i)} />
+                  <Device deviceData={item} key={item.id} onDelete={() => handleDeleteDevice(i, item.devName)} />
                 );
               })}
             </Blueprint>
@@ -48,7 +67,7 @@ function App() {
             <DevicesTable>
               {devices.map((item, i) => {
                 return (
-                  <DeviceRow deviceData={item} key={item.id} onDelete={() => handleDeleteDevice(i)} />
+                  <DeviceRow deviceData={item} key={item.id} onDelete={() => handleDeleteDevice(i, item.devName)} />
                 );
               })}
             </DevicesTable>
@@ -78,7 +97,6 @@ function DevicesTable(props) {
             <th>Name</th>
             <th>Temp &#8451;</th>
             <th>Hum %</th>
-            <th></th>
           </tr>
         </thead>
         <tbody>
@@ -98,7 +116,6 @@ function DeviceRow(props) {
         <td>{props.deviceData.devName}</td>
         <td>{data.out.celsius}</td>
         <td>{data.out.humidity}</td>
-        <td><Button type="button" onClick={props.onDelete}>Delete</Button></td>
       </tr>
     </>
   );
@@ -106,14 +123,25 @@ function DeviceRow(props) {
 
 function AddDevice(props) {
   const [devName, setDevName] = useState('');
+  const [popoverOpen, setPopoverOpen] = useState(false);
+
+  function toggle() {
+    if (devName.length === 0) {
+      setPopoverOpen(true);
+    } else {
+      setPopoverOpen(false);
+    }
+  }
 
   function handleNameChange(e) {
     setDevName(e.target.value);
   }
 
   function handleSetDevices(e) {
-    const newDevice = { id: devName, devName: devName }
-    props.onAddDevice(newDevice);
+    if (devName.length > 0) {
+      const newDevice = { id: devName, devName: devName }
+      props.onAddDevice(newDevice);
+    }
     e.preventDefault();
   }
 
@@ -123,7 +151,11 @@ function AddDevice(props) {
         <Label for="inputDeviceName">Name</Label>
         <Input id="inputDeviceName" type="text" value={devName} onChange={handleNameChange} />
       </FormGroup>
-      <Button type="submit">Add</Button>
+      <Button id="AddButton" type="submit">Add</Button>
+      <Popover placement="bottom" isOpen={popoverOpen} target="AddButton" toggle={toggle}>
+        <PopoverHeader>Error</PopoverHeader>
+        <PopoverBody>Please enter name.</PopoverBody>
+      </Popover>
     </Form>
   );
 }
@@ -154,7 +186,7 @@ function Device(props) {
     const data = { devName: devname, posX: posx, posY: posy };
     console.log(data);
 
-    fetch('http://localhost:3001/add', {
+    fetch('https://mongobackend.azurewebsites.net/add', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -188,6 +220,7 @@ function Device(props) {
                 Hum: {data.out.humidity} %
             </CardText>
               <Button type="button" onClick={() => onSaveClick(props.deviceData.devName, controlledPosition.x, controlledPosition.y)}>Save</Button>
+              &nbsp;
               <Button type="button" onClick={props.onDelete}>Delete</Button>
             </CardBody>
           </Collapse>
@@ -240,7 +273,7 @@ function useFetchDeviceData(deviceName) {
 function useFetchAllDevices() {
   const [data, setData] = useState([]);
   const [error, setError] = useState(null);
-  const url = 'http://localhost:3001/fetch';
+  const url = 'https://mongobackend.azurewebsites.net/fetch';
 
   useEffect(() => {
     const fetchAllDevices = async () => {
