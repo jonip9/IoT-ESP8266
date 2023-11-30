@@ -2,7 +2,7 @@
 
 ## Kuvaus
 
-Frontend IoT-kouluprojektille, jossa ESP8266-moduuli mittaa ympäristön lämpötilan ja kosteuden, lähettää ne [Thinger.io](https://thinger.io/)-palveluun, josta tämä sovellus sitten hakee viimeisimmät tiedot ja näyttää ne käyttäjälle. Projekti oli ryhmätyö, mutta frontendin toteutus oli kokonaisuudessaan minun vastuulla.
+Frontend IoT-kouluprojektille, jossa ESP8266-moduuli mittaa ympäristön lämpötilan ja kosteuden, lähettää ne [Thinger.io](https://thinger.io/)-palveluun, josta tämä sovellus sitten hakee viimeisimmät tiedot ja näyttää ne käyttäjälle. Projekti oli ryhmätyö.
 
 Sovelluksessa käyttäjä voi lisätä laitteita pohjapiirroksen päälle ja siirtää niitä haluamaansa paikkaan. Näytettävä  tieto päivittyy laitekohtaisesti automaattisesti tietyin väliajoin. Tuplaklikkaamalla laitetta avautuu kontrollit tallennukselle ja poistolle. Käyttäjä voi tallentaa laitteen sijainnin pohjapiirroksessa, jolloin se tallentuu erilliseen MongoDB-palvelimeen. Sivun latautuessa tallennetut laitteet haetaan palvelimelta ja näytetään oikeilla paikoillaan.
 
